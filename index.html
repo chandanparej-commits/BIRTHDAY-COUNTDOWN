@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prisha's Sweet 17 Countdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500;1,600&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FFF8F0;
+    --periwinkle: #C9CCF5;
+    --periwinkle-deep: #9FA3E8;
+    --berry: #7B2D5E;
+    --yellow: #FDE68A;
+    --coral: #FF8FA3;
+    --sage: #A8C9A1;
+    --ink: #4A2E3F;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Quicksand', sans-serif;
+    overflow-x: hidden;
+  }
+
+  body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px 80px;
+    position: relative;
+  }
+
+  /* ambient floating balloons */
+  .balloon{
+    position: fixed;
+    bottom: -140px;
+    width: 46px;
+    height: 58px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    opacity: 0.55;
+    animation: drift linear infinite;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .balloon::after{
+    content: '';
+    position: absolute;
+    bottom: -34px;
+    left: 50%;
+    width: 1px;
+    height: 34px;
+    background: rgba(74,46,63,0.35);
+  }
+  .balloon.b1{ left: 8%;  background: var(--periwinkle-deep); animation-duration: 17s; animation-delay: 0s; }
+  .balloon.b2{ left: 22%; background: var(--coral);           animation-duration: 21s; animation-delay: 3s; }
+  .balloon.b3{ left: 68%; background: var(--sage);            animation-duration: 19s; animation-delay: 6s; }
+  .balloon.b4{ left: 84%; background: var(--yellow);          animation-duration: 24s; animation-delay: 1.5s; }
+  .balloon.b5{ left: 45%; background: var(--periwinkle);      animation-duration: 26s; animation-delay: 9s; }
+
+  @keyframes drift{
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); }
+    50%  { transform: translateY(-58vh) translateX(24px) rotate(6deg); }
+    100% { transform: translateY(-118vh) translateX(-16px) rotate(-4deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .balloon{ animation: none; display: none; }
+  }
+
+  .page{
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 28px;
+  }
+
+  .eyebrow{
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--berry);
+    opacity: 0.75;
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(38px, 8vw, 60px);
+    line-height: 1.05;
+    margin: 0;
+    color: var(--berry);
+  }
+
+  h1 span{
+    display: inline-block;
+    color: var(--coral);
+    font-style: normal;
+  }
+
+  .subtitle{
+    font-size: 16px;
+    max-width: 420px;
+    line-height: 1.5;
+    color: var(--ink);
+    opacity: 0.85;
+  }
+
+  /* countdown */
+  .countdown{
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .unit{
+    background: #ffffff;
+    border: 2px solid var(--periwinkle);
+    border-radius: 20px;
+    padding: 18px 14px;
+    min-width: 78px;
+    box-shadow: 0 6px 0 var(--periwinkle);
+  }
+
+  .unit .num{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(28px, 6vw, 40px);
+    color: var(--berry);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .unit .label{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--berry);
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+
+  .done-banner{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: clamp(26px, 6vw, 38px);
+    color: var(--coral);
+    display: none;
+  }
+
+  /* interactive question card */
+  .card{
+    position: relative;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 36px 24px 60px;
+    border: 2px dashed var(--periwinkle-deep);
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    overflow: hidden;
+  }
+
+  .card h2{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(20px, 4.6vw, 26px);
+    margin: 0;
+    color: var(--berry);
+  }
+
+  .btn-row{
+    position: relative;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+  }
+
+  button{
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 30px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, font-size 0.2s ease, background 0.2s ease;
+  }
+
+  button:focus-visible{
+    outline: 3px solid var(--berry);
+    outline-offset: 3px;
+  }
+
+  #yesBtn{
+    background: var(--coral);
+    color: #fff;
+    box-shadow: 0 6px 0 #d96b80;
+  }
+  #yesBtn:hover{ transform: translateY(-2px); }
+  #yesBtn:active{ transform: translateY(2px); box-shadow: 0 3px 0 #d96b80; }
+
+  #noBtn{
+    background: var(--periwinkle);
+    color: var(--berry);
+    box-shadow: 0 6px 0 var(--periwinkle-deep);
+    z-index: 3;
+  }
+
+  #noBtn.roaming{
+    position: absolute;
+  }
+
+  .attempt-note{
+    font-size: 13px;
+    color: var(--berry);
+    opacity: 0.65;
+    min-height: 18px;
+  }
+
+  .reveal{
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    max-width: 480px;
+  }
+
+  .reveal.show{
+    display: flex;
+    animation: pop-in 0.5s ease;
+  }
+
+  @keyframes pop-in{
+    from{ opacity: 0; transform: scale(0.9) translateY(8px); }
+    to{ opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .reveal p{
+    font-family: 'Fraunces', serif;
+    font-size: clamp(18px, 4vw, 22px);
+    font-style: italic;
+    color: var(--berry);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .reveal .sign{
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+    opacity: 0.7;
+  }
+
+  .wish-btn{
+    background: var(--sage);
+    color: var(--ink);
+    box-shadow: 0 6px 0 #86ac80;
+  }
+  .wish-btn:hover{ transform: translateY(-2px); }
+  .wish-btn:active{ transform: translateY(2px); box-shadow: 0 3px 0 #86ac80; }
+
+  .footer-note{
+    font-size: 13px;
+    color: var(--berry);
+    opacity: 0.55;
+  }
+
+  canvas#confetti{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  @media (max-width: 420px){
+    .btn-row{ gap: 10px; }
+    button{ padding: 12px 22px; font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="balloon b1"></div>
+  <div class="balloon b2"></div>
+  <div class="balloon b3"></div>
+  <div class="balloon b4"></div>
+  <div class="balloon b5"></div>
+
+  <canvas id="confetti"></canvas>
+
+  <main class="page">
+    <p class="eyebrow">the countdown is on</p>
+    <h1>Prisha turns <span>17</span></h1>
+    <p class="subtitle">September 6th is coming — and honestly, I've been counting down for weeks. Here's exactly how long you have left to enjoy being 16. 🎈</p>
+
+    <div class="countdown" id="countdown">
+      <div class="unit"><div class="num" id="days">00</div><div class="label">days</div></div>
+      <div class="unit"><div class="num" id="hours">00</div><div class="label">hrs</div></div>
+      <div class="unit"><div class="num" id="minutes">00</div><div class="label">min</div></div>
+      <div class="unit"><div class="num" id="seconds">00</div><div class="label">sec</div></div>
+    </div>
+    <div class="done-banner" id="doneBanner">IT'S YOUR DAY!! 🎉</div>
+
+    <div class="card">
+      <h2>Are you even a little excited, Prisha?</h2>
+      <div class="btn-row" id="btnRow">
+        <button id="yesBtn">Yes!</button>
+        <button id="noBtn">No</button>
+      </div>
+      <p class="attempt-note" id="attemptNote">&nbsp;</p>
+
+      <div class="reveal" id="reveal">
+        <p>"Knew you couldn't say no. Here's to 17 — may it bring you every bit of joy you give everyone else. You are so, so loved, Prisha. Happy almost-birthday. 💛"</p>
+        <span class="sign">— counting down with you</span>
+        <button class="wish-btn" id="wishBtn">Make a birthday wish 🌟</button>
+        <p class="attempt-note" id="wishNote">&nbsp;</p>
+      </div>
+    </div>
+
+    <p class="footer-note">Made with way too much excitement, just for you.</p>
+  </main>
+
+<script>
+  // ---------- Countdown ----------
+  const target = new Date('2026-09-06T00:00:00');
+  const daysEl = document.getElementById('days');
+  const hoursEl = document.getElementById('hours');
+  const minutesEl = document.getElementById('minutes');
+  const secondsEl = document.getElementById('seconds');
+  const countdownEl = document.getElementById('countdown');
+  const doneBanner = document.getElementById('doneBanner');
+
+  function pad(n){ return String(n).padStart(2, '0'); }
+
+  function tick(){
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0){
+      countdownEl.style.display = 'none';
+      doneBanner.style.display = 'block';
+      clearInterval(timer);
+      return;
+    }
+    const d = Math.floor(diff / (1000*60*60*24));
+    const h = Math.floor((diff / (1000*60*60)) % 24);
+    const m = Math.floor((diff / (1000*60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+    daysEl.textContent = pad(d);
+    hoursEl.textContent = pad(h);
+    minutesEl.textContent = pad(m);
+    secondsEl.textContent = pad(s);
+  }
+  tick();
+  const timer = setInterval(tick, 1000);
+
+  // ---------- Dodging "No" button ----------
+  const btnRow = document.getElementById('btnRow');
+  const noBtn = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+  const attemptNote = document.getElementById('attemptNote');
+
+  const yesMessages = ["Yes!", "Yes, really!", "SO yes!", "Absolutely yes!", "100% YES!", "Yes forever!"];
+  const teaseNotes = [
+    "nice try 👀",
+    "not today!",
+    "she's quick",
+    "almost had her",
+    "no is simply unavailable",
+    "give up yet?"
+  ];
+  let attempts = 0;
+
+  function moveNoButton(){
+    const rowRect = btnRow.getBoundingClientRect();
+    const btnRect = noBtn.getBoundingClientRect();
+
+    if (!noBtn.classList.contains('roaming')){
+      // switch to absolute positioning at its current spot first
+      noBtn.style.left = (btnRect.left - rowRect.left) + 'px';
+      noBtn.style.top = (btnRect.top - rowRect.top) + 'px';
+      noBtn.classList.add('roaming');
+      // force reflow so the browser registers the starting position
+      void noBtn.offsetWidth;
+    }
+
+    const maxLeft = Math.max(rowRect.width - btnRect.width, 0);
+    const maxTop = Math.max(rowRect.height - btnRect.height, 0);
+    const newLeft = Math.random() * maxLeft;
+    const newTop = Math.random() * maxTop;
+
+    noBtn.style.left = newLeft + 'px';
+    noBtn.style.top = newTop + 'px';
+
+    attempts++;
+    attemptNote.textContent = teaseNotes[Math.min(attempts - 1, teaseNotes.length - 1)];
+
+    const growth = Math.min(attempts * 0.06, 0.5);
+    yesBtn.style.fontSize = (16 + growth * 10) + 'px';
+    yesBtn.style.transform = `scale(${1 + growth * 0.15})`;
+    yesBtn.textContent = yesMessages[Math.min(attempts, yesMessages.length - 1)];
+  }
+
+  noBtn.addEventListener('mouseenter', moveNoButton);
+  noBtn.addEventListener('touchstart', function(e){
+    e.preventDefault();
+    moveNoButton();
+  }, { passive: false });
+  noBtn.addEventListener('click', function(e){
+    // if somehow clicked (e.g. keyboard), just dodge instead of "answering no"
+    e.preventDefault();
+    moveNoButton();
+  });
+
+  // ---------- Yes reveal ----------
+  const reveal = document.getElementById('reveal');
+  yesBtn.addEventListener('click', function(){
+    reveal.classList.add('show');
+    burstConfetti();
+    yesBtn.disabled = true;
+    noBtn.disabled = true;
+    noBtn.style.opacity = '0.4';
+    attemptNote.textContent = 'she said yes 🎉';
+  });
+
+  // ---------- Make a wish ----------
+  const wishBtn = document.getElementById('wishBtn');
+  const wishNote = document.getElementById('wishNote');
+  const wishes = [
+    "wish sent to the universe 🌟",
+    "the candles heard that one",
+    "manifesting it as we speak",
+    "the stars are on it ✨"
+  ];
+  wishBtn.addEventListener('click', function(){
+    wishNote.textContent = wishes[Math.floor(Math.random() * wishes.length)];
+    burstConfetti();
+  });
+
+  // ---------- Confetti ----------
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  let confettiParticles = [];
+  let confettiAnimating = false;
+
+  function resizeCanvas(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const confettiColors = ['#FF8FA3', '#FDE68A', '#C9CCF5', '#A8C9A1', '#7B2D5E'];
+
+  function burstConfetti(){
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    for (let i = 0; i < 90; i++){
+      confettiParticles.push({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * canvas.height * 0.3,
+        w: 6 + Math.random() * 6,
+        h: 8 + Math.random() * 8,
+        color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 10,
+        vy: 2 + Math.random() * 3,
+        vx: (Math.random() - 0.5) * 2,
+        life: 0
+      });
+    }
+    if (!confettiAnimating){
+      confettiAnimating = true;
+      requestAnimationFrame(animateConfetti);
+    }
+  }
+
+  function animateConfetti(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confettiParticles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.rotSpeed;
+      p.life++;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(1 - p.life / 400, 0);
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+    });
+    confettiParticles = confettiParticles.filter(p => p.y < canvas.height + 40 && p.life < 400);
+
+    if (confettiParticles.length > 0){
+      requestAnimationFrame(animateConfetti);
+    } else {
+      confettiAnimating = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+</script>
+</body>
+</html>
